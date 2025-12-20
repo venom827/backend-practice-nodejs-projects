@@ -6,4 +6,11 @@ const createUserSchema = z.object({
     age: z.number().int().min(18),
 })
 
-module.exports = {createUserSchema};
+const loginSchema = z.object({
+
+    email: z.string().email(),
+    password: z.string().min(8)
+
+})
+
+module.exports = {createUserSchema,loginSchema};
