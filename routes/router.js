@@ -1,17 +1,37 @@
 const validate = require("../middleware/validate.js");
 const {createUserSchema} = require("../validation/users.schema.js");
-const {saveUsers,loadUsers} = require("../db/users-db.js")
+const db = require("../db/users-db.js")
 const express = require("express");
 const router = express.Router();
-let users = loadUsers();
+
 
 router.post(
     "/users",
     validate(createUserSchema),
     (req,res)=>{
-        users.push(req.body);
-        saveUsers(users);
-        res.json({ok:true,user:req.body,count:users.length})
+       const {email,password,age}=req.body;
+       db.run(
+        `INSERT INTO users(email, password, age) VALUES (?, ?, ?)`,
+        [email,password,age],
+        function(err){
+            if(err){
+                return res.status(400).json({error:err.message});
+            }
+            res.json({
+                ok:true,
+                userID:this.lastID
+            })
+        }
+       )
     }
 )
+
+router.get('/users',
+    (req,res)=>{
+        db.all(`SELECT * FROM users`, [], (err,rows)=>{
+            if(err) {return res.status(400).json({error:err.message});}
+            res.json(rows);
+        });
+    }
+);
 module.exports = router;

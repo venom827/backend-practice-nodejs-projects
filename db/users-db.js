@@ -1,14 +1,19 @@
-const fs = require("fs");
+const sqlite3 = require("sqlite3").verbose();
+const path = require("path");
 
-function saveUsers(user){
-    fs.writeFileSync("users.json",JSON.stringify(user));
-}
+const db = new sqlite3.Database(
+    path.join(__dirname,"app.db")
+)
 
-function loadUsers(){
-    if (!fs.existsSync("users.json")) return [];
-    const data = fs.readFileSync("users.json","utf-8")
-    if (!data.trim()) return [];
-    return JSON.parse(data);
-}
+db.serialize(()=>{
+    db.run(
+        `CREATE TABLE IF NOT EXISTS users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        age INTEGER NOT NULL
+        )`  
+    )
+});
 
-module.exports = {saveUsers,loadUsers}
+module.exports = db;
