@@ -10,7 +10,6 @@ function createUser({email,passwordHash,age}){
                 resolve({
                     id:this.lastID,
                     email,
-                    passwordHash,
                     age
                 });
             }
